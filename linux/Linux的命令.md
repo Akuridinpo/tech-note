@@ -171,10 +171,36 @@
 + `ifconfig ` 查看网络信息
 + `ip a` 查看 ip 信息
 + `ping + ip地址/主机名/域名` 检查与目标的网络信号
++ `netstat` 监控后台服务和外界程序的链接状态
 # Linux 进程相关命令
 [[Linux 进程]]
-+ 查看前台进程: `top`
++ 查看前台进程（动态）: `top`
 + 查看后台进程：`ps`
 + 终止进程: `kill 进程id`
 + 强制终止: `kill -9 进程id`
 + 终止进程以及子进程: `kill -all`
+
+# Linux 服务相关命令
+	后台服务程序(也称守护进程)会监听端口，前台程序通过端口和后台服务进行交互。
+	在centos7前，常用service指令和chkconfig指令调度服务程序，在centos7开始常用systemctl
++ 在 `/etc/init.d` 中可以查看服务程序
++ `service 服务程序名 status` 可以查看服务状态
++ `service 服务程序名 stop/start` 关闭或者启动服务
++ 更多服务可以使用 `setup` 进入图形操作界面，选择 system service 可以看到哪些服务可以被 `service` 指令管理
+	带 `[*]` 的服务是开机自启的服务
++ 使用 `chkconfig --level 运行级别数 服务程序名 off/on` 指定运行级别数下的指定服务程序的开启和关闭，运行级别数残照 [[Linux 运行级别]]
+## `systemctl` 指令
++ systemctl 指令管理的服务在 `/usr/lib/systemd/system` 中查看
++ `systemctl list-unit-files` 查看 systemctl 可管理的服务
+
+| `systemctl` | `start` | `stop` | `restart` | `status` | `is-enabled` | `enable` | `disable` |
+| ----------- | ------- | ------ | --------- | -------- | ------------ | -------- | --------- |
+| 操作服务        | 开启      | 关闭     | 重启        | 查看情况     | 是否开机自启       | 设为开机自启   | 关闭开机自启    |
+# Linux 防火墙相关命令
+	Linux外界想访问后台服务时，需要通过该服务监听的端口与其进行交互。防火墙用于监管这些端口的开放与否。
+
+
+| `firewall-cmd` | --permanent | --add-port=端口/协议 | --remove-port=端口/协议 | --queer-port=端口/协议 | --list-ports | --reload         |
+| -------------- | ----------- | ---------------- | ------------------- | ------------------ | ------------ | ---------------- |
+| 防火墙操作          | 永久操作        | 打开端口/允许协议        | 关闭端口/禁用协议           | 查询是否开启             | 查看开放的端口号     | 重置防火墙（在打开或关闭端口后） |
++ 在使用 `firewall-cmd --list-ports` 时，可能没有显示端口 22，也就是 sshd 服务的默认端口，但我们仍然可以在外部通过该端口访问 sshd 服务，是因为 linux 的 publish 区域默认允许了 ssh 服务，可以通过 firewall-cmd --list-services 查看到 `dhcpv6-client ssh` ，说明这两个服务被默认允许了。
